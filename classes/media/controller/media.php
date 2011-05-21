@@ -12,57 +12,49 @@ class Media_Controller_Media extends Controller
 		$this->config = Kohana::config('media');
 	}
 	
-	public function action_style($path, $file)
+	public function handle_request($action, $path, $extension, $use_fallback = TRUE)
 	{
-		$style = $this->config['styles']['directory'] . $this->get_file_path($path, $file);
+		$config_key = Inflector::plural($action);
+		$action_method = 'action_' . $action;
 		
-		if ($this->find_file($style, 'css')) {
-			$this->display_file($style, 'css');
-		} else {
-			$this->error();
-		}
-	}
-
-	public function action_script($path, $file)
-	{
-		$script = $this->config['scripts']['directory'] . $this->get_file_path($path, $file);
-
-		if ($this->find_file($script, 'js')) {
-			$this->display_file($script, 'js');
+		$file = $this->config[$config_key]['directory'] . $path);
+		
+		if ($this->find_file($file, $extension)) {
+			$this->display_file($file, $extension);
+		} elseif ($use_fallback === TRUE) {
+			$this->$action_method(
+				Request::current()->query('fallback'),
+				FALSE
+			);
 		} else {
 			$this->error();
 		}
 	}
 	
-	public function action_image($path, $file)
+	public function action_style($path, $use_fallback = TRUE)
 	{
-		$image = $this->config['images']['directory'] . $this->get_file_path($path, $file);
-		$extension = $this->find_image_file($image);
-		
-		if ($extension !== FALSE) {
-			$this->display_file($image, $extension);
-		} else {
-			$this->error();
-		}
+		$this->handle_request('style', $path, 'css', $use_fallback);
 	}
 
-	protected function get_file_path($path, $file)
+	public function action_script($path, $use_fallback = TRUE)
 	{
-		$file_path = '';
-		
-		if (!empty($path)) {
-			$file_path .= $path . '/';
-		}
-		
-		return $file_path . $file;
+		$this->handle_request('script', $path, 'js', $use_fallback);
 	}
 	
-	protected function find_file($file, $ext)
+	public function action_image($path, $use_fallback = TRUE)
 	{
-		return Kohana::find_file('media', $file, $ext);
+		$image = $this->config['images']['directory'] . $path;
+		$extension = $this->find_image_extension($image);
+		
+		$this->handle_request('image', $path, $extension, $use_fallback);
+	}
+	
+	protected function find_file($file, $extension)
+	{
+		return Kohana::find_file('media', $file, $extension);
 	}
 
-	protected function find_image_file($file)
+	protected function find_image_extension($file)
 	{
 		foreach ($this->config['images']['extensions'] as $extension) {
 			if (Kohana::find_file('media', $file, $extension) !== FALSE) {
@@ -87,13 +79,8 @@ class Media_Controller_Media extends Controller
 	
 	protected function error()
 	{
-		$file = $this->get_file_path(
-			$this->request->param('path', NULL),
-			$this->request->param('file', NULL)
-		);
-		
 		throw new Http_Exception_404('File :file not found.', array(
-			':file'	=> $file,
+			':file'	=> $this->request->param('path', NULL),
 		));
 	}
 	

@@ -2,7 +2,7 @@
 
 return array(
 	'images'  => array(
-		'extensions' => array('png', 'jpg', 'gif'),
+		'extensions' => array('png', 'jpg', 'jpeg', 'gif'),
 		'directory'  => 'images/',
 	),
 	'styles'  => array(
