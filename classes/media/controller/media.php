@@ -17,7 +17,7 @@ class Media_Controller_Media extends Controller
 		$config_key = Inflector::plural($action);
 		$action_method = 'action_' . $action;
 		
-		$file = $this->config[$config_key]['directory'] . $path);
+		$file = $this->config[$config_key]['directory'] . $path;
 		
 		if ($this->find_file($file, $extension)) {
 			$this->display_file($file, $extension);
