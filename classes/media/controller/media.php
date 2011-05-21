@@ -24,6 +24,7 @@ class Media_Controller_Media extends Controller
 		} elseif ($use_fallback === TRUE) {
 			$this->$action_method(
 				Request::current()->query('fallback'),
+				NULL,
 				FALSE
 			);
 		} else {
@@ -31,17 +32,17 @@ class Media_Controller_Media extends Controller
 		}
 	}
 	
-	public function action_style($path, $use_fallback = TRUE)
+	public function action_style($path, $format = NULL, $use_fallback = TRUE)
 	{
 		$this->handle_request('style', $path, 'css', $use_fallback);
 	}
 
-	public function action_script($path, $use_fallback = TRUE)
+	public function action_script($path, $format = NULL, $use_fallback = TRUE)
 	{
 		$this->handle_request('script', $path, 'js', $use_fallback);
 	}
 	
-	public function action_image($path, $use_fallback = TRUE)
+	public function action_image($path, $format = NULL, $use_fallback = TRUE)
 	{
 		$image = $this->config['images']['directory'] . $path;
 		$extension = $this->find_image_extension($image);
