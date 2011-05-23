@@ -72,10 +72,10 @@ class Media_Controller_Media extends Controller
 		
 		$this->response->headers(array(
 			'Content-Type'		=> File::mime_by_ext($ext) . '; charset=utf-8',
-			'Content-Length'	=> (string) File::size($path),
+			'Content-Length'	=> (string) filesize($path),
 		));
 		
-		$this->response->body(File::content($path));
+		$this->response->body(file_get_contents($path));
 	}
 	
 	protected function error()
